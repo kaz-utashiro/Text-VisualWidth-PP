@@ -6,13 +6,13 @@ use parent qw(Exporter);
 our $VERSION = '0.08';
 our @EXPORT_OK = qw(vwidth vtrim);
 
-# Perl 5.12 and later have the East_Asian_Width property with correct
-# values for every code point, and the table follows the Unicode
-# version of the perl in use.  Unicode::EastAsianWidth is used on
-# older perls only; its table is Unicode 12.0 and does not know the
-# characters added since (U+1FAAA IDENTIFICATION CARD, for example),
-# which it gives no width.
-use constant BUILTIN_EAW => $^V ge v5.12;
+# The East_Asian_Width property of perl follows the Unicode version
+# of the perl in use, while the table of Unicode::EastAsianWidth is
+# Unicode 12.0 and does not know the characters added since (U+1FAAA
+# IDENTIFICATION CARD, for example), which it gives no width.  Use
+# the property of perl when it is newer than the table: perl 5.30 is
+# the first with Unicode 12.1.  Older perls use the table.
+use constant BUILTIN_EAW => $^V ge v5.30;
 
 BEGIN {
     unless (BUILTIN_EAW) {
@@ -163,10 +163,11 @@ If you want to detect the ambw parameter from users' environment, please look L<
 
 =head1 Unicode Version
 
-On perl 5.12 and later, the width classes come from the
+On perl 5.30 and later, the width classes come from the
 C<East_Asian_Width> property of perl itself, so they follow the
 Unicode version of the perl in use (see L<perluniprops>).  On older
-perls, the table of L<Unicode::EastAsianWidth> is used.
+perls, the table of L<Unicode::EastAsianWidth> (Unicode 12.0) is
+used, which is newer than the Unicode version of those perls.
 
 =head1 AUTHOR
 

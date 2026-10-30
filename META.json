@@ -57,13 +57,13 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/tokuhirom/Text-VisualWidth-PP/issues"
+         "web" : "https://github.com/kaz-utashiro/Text-VisualWidth-PP/issues"
       },
-      "homepage" : "https://github.com/tokuhirom/Text-VisualWidth-PP",
+      "homepage" : "https://github.com/kaz-utashiro/Text-VisualWidth-PP",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/tokuhirom/Text-VisualWidth-PP.git",
-         "web" : "https://github.com/tokuhirom/Text-VisualWidth-PP"
+         "url" : "https://github.com/kaz-utashiro/Text-VisualWidth-PP.git",
+         "web" : "https://github.com/kaz-utashiro/Text-VisualWidth-PP"
       }
    },
    "version" : "0.08",
