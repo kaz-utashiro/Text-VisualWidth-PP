@@ -1,5 +1,4 @@
-requires 'perl', '5.008001';
-requires 'Unicode::EastAsianWidth', '1.3';
+requires 'perl', '5.008005';
 requires 'parent';
 requires 'Exporter';
 

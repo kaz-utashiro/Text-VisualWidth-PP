@@ -1,39 +1,21 @@
 package Text::VisualWidth::PP;
 use strict;
 use warnings;
-use 5.008001;
+use 5.008005;
 use parent qw(Exporter);
 our $VERSION = '0.08';
 our @EXPORT_OK = qw(vwidth vtrim);
 
-# The East_Asian_Width property of perl follows the Unicode version
-# of the perl in use, while the table of Unicode::EastAsianWidth is
-# Unicode 12.0 and does not know the characters added since (U+1FAAA
-# IDENTIFICATION CARD, for example), which it gives no width.  Use
-# the property of perl when it is newer than the table: perl 5.30 is
-# the first with Unicode 12.1.  Older perls use the table.
-use constant BUILTIN_EAW => $^V ge v5.30;
-
-BEGIN {
-    unless (BUILTIN_EAW) {
-	require Unicode::EastAsianWidth;
-	Unicode::EastAsianWidth->import;
-    }
-}
-
 # for backward compatibility, see the POD
 our $EastAsian = do { no warnings 'once'; $Unicode::EastAsianWidth::EastAsian };
 
-# Each class as a user-defined property body: the built-in property,
-# or the table of Unicode::EastAsianWidth.
+# Each width class as a user-defined property body.  The
+# East_Asian_Width property of perl (5.8.5 and later) follows the
+# Unicode version of the perl in use, as the other properties used
+# here do.
 sub EAW {
     my $class = shift;
-    if (BUILTIN_EAW) {
-	"+utf8::East_Asian_Width=$class\n";
-    } else {
-	no strict 'refs';
-	&{"InEastAsian$class"}();
-    }
+    "+utf8::East_Asian_Width=$class\n";
 }
 
 if ($^V lt v5.32) {
@@ -156,18 +138,22 @@ This module treats ambiguous characters are half width by default.
 
 And you can specify the behavior by the C<$Text::VisualWidth::PP::EastAsian> flag expressly.
 
-Note: If C<$Unicode::EastAsianWidth::EastAsian> is true on compilation time, this module set C<$Text::VisualWidth::PP::EastAsian> as true for backward compatibility.
+Note: If C<$Unicode::EastAsianWidth::EastAsian> is true when this module is loaded, this module set C<$Text::VisualWidth::PP::EastAsian> as true for backward compatibility.  L<Unicode::EastAsianWidth> itself is not used any more.
 
 
 If you want to detect the ambw parameter from users' environment, please look L<Unicode::EastAsianWidth::Detect>.
 
 =head1 Unicode Version
 
-On perl 5.30 and later, the width classes come from the
-C<East_Asian_Width> property of perl itself, so they follow the
-Unicode version of the perl in use (see L<perluniprops>).  On older
-perls, the table of L<Unicode::EastAsianWidth> (Unicode 12.0) is
-used, which is newer than the Unicode version of those perls.
+The width classes come from the C<East_Asian_Width> property of perl
+itself, so they follow the Unicode version of the perl in use (see
+L<perluniprops>), as the other properties used by this module do.
+Characters added to Unicode after that version are treated as
+neutral, that is, half width.
+
+Earlier versions used the table of L<Unicode::EastAsianWidth>,
+which is fixed at Unicode 12.0 and gave no width to the characters
+added since.
 
 =head1 AUTHOR
 

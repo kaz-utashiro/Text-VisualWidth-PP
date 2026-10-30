@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
-use Unicode::EastAsianWidth;
 use Text::VisualWidth::PP;
 
 # HYPHEN, an ambiguous-width character

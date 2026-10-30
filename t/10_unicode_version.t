@@ -6,11 +6,9 @@ use Unicode::UCD ();
 
 use Text::VisualWidth::PP 'vwidth';
 
-# Characters added after Unicode 12.0, the version of the table in
-# Unicode::EastAsianWidth, have their width from the Unicode version
-# of the perl in use.
-
-plan skip_all => 'the table is used before perl 5.30' if $^V lt v5.30;
+# The width classes come from the East_Asian_Width property of perl,
+# so the characters added in each Unicode version have their width
+# on the perls that know that version.
 
 my $unicode = Unicode::UCD::UnicodeVersion();
 my($major, $minor) = split /\./, $unicode;

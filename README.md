@@ -27,9 +27,21 @@ This module treats ambiguous characters are half width by default.
 
 And you can specify the behavior by the `$Text::VisualWidth::PP::EastAsian` flag expressly.
 
-Note: If `$Unicode::EastAsianWidth::EastAsian` is true on compilation time, this module set `$Text::VisualWidth::PP::EastAsian` as true for backward compatibility.
+Note: If `$Unicode::EastAsianWidth::EastAsian` is true when this module is loaded, this module set `$Text::VisualWidth::PP::EastAsian` as true for backward compatibility.  [Unicode::EastAsianWidth](https://metacpan.org/pod/Unicode%3A%3AEastAsianWidth) itself is not used any more.
 
 If you want to detect the ambw parameter from users' environment, please look [Unicode::EastAsianWidth::Detect](https://metacpan.org/pod/Unicode%3A%3AEastAsianWidth%3A%3ADetect).
+
+# Unicode Version
+
+The width classes come from the `East_Asian_Width` property of perl
+itself, so they follow the Unicode version of the perl in use (see
+[perluniprops](https://metacpan.org/pod/perluniprops)), as the other properties used by this module do.
+Characters added to Unicode after that version are treated as
+neutral, that is, half width.
+
+Earlier versions used the table of [Unicode::EastAsianWidth](https://metacpan.org/pod/Unicode%3A%3AEastAsianWidth),
+which is fixed at Unicode 12.0 and gave no width to the characters
+added since.
 
 # AUTHOR
 

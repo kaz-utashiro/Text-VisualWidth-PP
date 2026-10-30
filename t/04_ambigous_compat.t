@@ -3,8 +3,6 @@ use warnings;
 use utf8;
 use Test::More;
 BEGIN { $Unicode::EastAsianWidth::EastAsian = 1; }
-use Unicode::EastAsianWidth;
-BEGIN { $Unicode::EastAsianWidth::EastAsian = 1; }
 use Text::VisualWidth::PP;
 
 # T::VW::PP thinks ambigous char is full width when $U::EAW::EastAsian is true.

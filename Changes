@@ -2,6 +2,14 @@ Revision history for Perl module Text::VisualWidth::PP
 
 {{$NEXT}}
 
+    - Use the East_Asian_Width property of perl in place of the table
+      of Unicode::EastAsianWidth, which is fixed at Unicode 12.0 and
+      gave no width to the characters added since, such as U+1FAAA
+      IDENTIFICATION CARD.  The width now follows the Unicode version
+      of the perl in use, as the other properties used here already
+      did.  Unicode::EastAsianWidth is no longer required.
+    - Require perl 5.8.5, the first with the East_Asian_Width property.
+
 0.08 2025-02-26T06:47:09Z
 
     commit d10bff3580c0914cf716170a4e9a232b5b508a3e
