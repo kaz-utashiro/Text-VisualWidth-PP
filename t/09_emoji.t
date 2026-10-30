@@ -4,6 +4,15 @@ use utf8;
 use Test::More;
 
 use Text::VisualWidth::PP 'vwidth';
+use Unicode::UCD ();
+
+# BEARDED PERSON was added in Unicode 10.0 (perl 5.28); the width of a
+# character comes from the Unicode version of the perl in use.
+my $unicode = Unicode::UCD::UnicodeVersion();
+my $bearded = (split /\./, $unicode)[0] >= 10;
+
+SKIP: {
+skip "BEARDED PERSON needs Unicode 10.0, perl has $unicode", 2 unless $bearded;
 
 is(vwidth("\N{U+1f9d4}") => 2,
           '\N{BEARDED PERSON}');
@@ -11,6 +20,8 @@ is(vwidth("\N{U+1f9d4}") => 2,
 is(vwidth("\N{U+1f9d4}\N{U+1f3fb}") => 2,
           '\N{BEARDED PERSON}'.
           '\N{EMOJI MODIFIER FITZPATRICK TYPE-1-2}');
+
+}
 
 if ($^V ge v5.28) {
 
@@ -23,12 +34,17 @@ is(vwidth("\N{U+1f600}\N{U+1f3fb}") => 4,
 
 }
 
+SKIP: {
+skip "BEARDED PERSON needs Unicode 10.0, perl has $unicode", 1 unless $bearded;
+
 is(vwidth("\N{U+1f9d4}\N{U+1f3fb}\N{U+200d}\N{U+2642}\N{U+fe0f}") => 2,
           '\N{BEARDED PERSON}'.
           '\N{EMOJI MODIFIER FITZPATRICK TYPE-1-2}'.
           '\N{ZERO WIDTH JOINER}'.
           '\N{MALE SIGN}'.
           '\N{VARIATION SELECTOR-16}');
+
+}
 
 is(vwidth("\N{U+1f468}\N{U+1f3ff}\N{U+200d}\N{U+1f9bd}\N{U+200d}\N{U+27a1}\N{U+fe0f}") => 2,
           '\N{MAN}'.
