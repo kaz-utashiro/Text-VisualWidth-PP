@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
+use Unicode::UCD ();
 
 use Text::VisualWidth::PP 'vwidth';
 
@@ -9,11 +10,25 @@ use Text::VisualWidth::PP 'vwidth';
 # Unicode::EastAsianWidth, have their width from the Unicode version
 # of the perl in use.
 
-plan skip_all => 'perl 5.32 or later has Unicode 13.0' if $^V lt v5.32;
+plan skip_all => 'the table is used before perl 5.30' if $^V lt v5.30;
 
-is(vwidth("\N{U+32FF}") => 2, '\N{SQUARE ERA NAME REIWA} (Unicode 12.1)');
-is(vwidth("\N{U+1FAAA}") => 2, '\N{IDENTIFICATION CARD} (Unicode 13.0)');
-is(vwidth("\N{U+1F6D7}") => 2, '\N{ELEVATOR} (Unicode 13.0)');
-is(vwidth("a\N{U+1FAAA}b") => 4, 'mixed with ASCII');
+my $unicode = Unicode::UCD::UnicodeVersion();
+my($major, $minor) = split /\./, $unicode;
+
+for my $case (
+    [ "\N{U+32FF}",  '12.1', 'SQUARE ERA NAME REIWA' ],
+    [ "\N{U+1F6D7}", '13.0', 'ELEVATOR' ],
+    [ "\N{U+1FAAA}", '14.0', 'IDENTIFICATION CARD' ],
+) {
+    my($char, $since, $name) = @$case;
+    my($need_major, $need_minor) = split /\./, $since;
+    SKIP: {
+	skip "$name needs Unicode $since, perl has $unicode", 2
+	    if $major < $need_major
+	    or $major == $need_major && $minor < $need_minor;
+	is(vwidth($char), 2, "$name (Unicode $since)");
+	is(vwidth("a${char}b"), 4, "$name between ASCII");
+    }
+}
 
 done_testing;
