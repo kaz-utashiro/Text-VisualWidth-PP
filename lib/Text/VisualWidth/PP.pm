@@ -4,11 +4,37 @@ use warnings;
 use 5.008001;
 use parent qw(Exporter);
 our $VERSION = '0.08';
-use Unicode::EastAsianWidth;
-
 our @EXPORT_OK = qw(vwidth vtrim);
 
-our $EastAsian = $Unicode::EastAsianWidth::EastAsian;
+# Perl 5.12 and later have the East_Asian_Width property with correct
+# values for every code point, and the table follows the Unicode
+# version of the perl in use.  Unicode::EastAsianWidth is used on
+# older perls only; its table is Unicode 12.0 and does not know the
+# characters added since (U+1FAAA IDENTIFICATION CARD, for example),
+# which it gives no width.
+use constant BUILTIN_EAW => $^V ge v5.12;
+
+BEGIN {
+    unless (BUILTIN_EAW) {
+	require Unicode::EastAsianWidth;
+	Unicode::EastAsianWidth->import;
+    }
+}
+
+# for backward compatibility, see the POD
+our $EastAsian = do { no warnings 'once'; $Unicode::EastAsianWidth::EastAsian };
+
+# Each class as a user-defined property body: the built-in property,
+# or the table of Unicode::EastAsianWidth.
+sub EAW {
+    my $class = shift;
+    if (BUILTIN_EAW) {
+	"+utf8::East_Asian_Width=$class\n";
+    } else {
+	no strict 'refs';
+	&{"InEastAsian$class"}();
+    }
+}
 
 if ($^V lt v5.32) {
     no strict 'refs';
@@ -26,24 +52,19 @@ END
 
 sub InVWPP1Fullwidth() {
     Spacing
-    InEastAsianFullwidth() . InEastAsianWide() . InEastAsianAmbiguous()
+    EAW('Fullwidth') . EAW('Wide') . EAW('Ambiguous')
 }
 sub InVWPP0Fullwidth() {
     Spacing
-    InEastAsianFullwidth() . InEastAsianWide()
+    EAW('Fullwidth') . EAW('Wide')
 }
 sub InVWPP1Halfwidth() {
     Spacing
-    InEastAsianHalfwidth().
-    InEastAsianNarrow().
-    InEastAsianNeutral()
+    EAW('Halfwidth') . EAW('Narrow') . EAW('Neutral')
 }
 sub InVWPP0Halfwidth() {
     Spacing
-    InEastAsianHalfwidth().
-    InEastAsianNarrow().
-    InEastAsianNeutral().
-    InEastAsianAmbiguous()
+    EAW('Halfwidth') . EAW('Narrow') . EAW('Neutral') . EAW('Ambiguous')
 }
 
 sub vwidth { width(@_) }
@@ -139,6 +160,13 @@ Note: If C<$Unicode::EastAsianWidth::EastAsian> is true on compilation time, thi
 
 
 If you want to detect the ambw parameter from users' environment, please look L<Unicode::EastAsianWidth::Detect>.
+
+=head1 Unicode Version
+
+On perl 5.12 and later, the width classes come from the
+C<East_Asian_Width> property of perl itself, so they follow the
+Unicode version of the perl in use (see L<perluniprops>).  On older
+perls, the table of L<Unicode::EastAsianWidth> is used.
 
 =head1 AUTHOR
 
