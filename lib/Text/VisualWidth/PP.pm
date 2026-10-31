@@ -36,6 +36,11 @@ sub EAW {
     }
 }
 
+# The Emoji_Modifier property came to perl in 5.32 with Unicode 13.0.
+# Spacing refers to it as utf8::Is_Emoji_Modifier: on 5.32 and later
+# that is the built-in property, and older perls get this user-defined
+# property of the same name, with the code points as of the Unicode
+# versions those perls know.
 if ($^V lt v5.32) {
     no strict 'refs';
     *{"utf8::Is_Emoji_Modifier"} = sub { "1F3FB\t1F3FF\n" };
