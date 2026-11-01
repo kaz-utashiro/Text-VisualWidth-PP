@@ -80,20 +80,24 @@ my $EM = $^V ge v5.28 ? '(?>(?<!\p{Line_Break=E_Base})\p{Line_Break=E_Modifier})
                       : '(?!)' ;
 $EM = qr/$EM/; # to avoid error on v5.24
 
+# Each character counts by its class, full or half width, except one
+# after ZERO WIDTH JOINER (U+200D): it joins the one before it in an
+# emoji sequence and adds no width.
+#
+# Compiled once.  With $EM interpolated next to \N{U+200D}, perl parses
+# the pattern on every match before it finds that it has not changed,
+# which for a short string takes several times longer than the match.
+my @WIDTH_RE = map {
+    qr/((?:$EM|(?<!\N{U+200D})\p{InVWPP${_}Fullwidth})+)
+      |((?:    (?<!\N{U+200D})\p{InVWPP${_}Halfwidth})+)/x
+} 0, 1;
+
 sub width {
     my $str = shift;
-
+    my $re = $WIDTH_RE[$EastAsian ? 1 : 0];
     my $ret = 0;
-    if ($EastAsian) {
-        while ($str =~ /((?:$EM|(?<!\N{U+200D})\p{InVWPP1Fullwidth})+)
-                       |((?:    (?<!\N{U+200D})\p{InVWPP1Halfwidth})+)/xg) {
-            $ret += $1 ? length($1) * 2 : length($2)
-        }
-    } else {
-        while ($str =~ /((?:$EM|(?<!\N{U+200D})\p{InVWPP0Fullwidth})+)
-                       |((?:    (?<!\N{U+200D})\p{InVWPP0Halfwidth})+)/xg) {
-            $ret += $1 ? length($1) * 2 : length($2)
-        }
+    while ($str =~ /$re/g) {
+        $ret += $1 ? length($1) * 2 : length($2)
     }
     $ret;
 }
